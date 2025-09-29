@@ -144,23 +144,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
     {
-    case WM_COMMAND:
-        {
-            int wmId = LOWORD(wParam);
-            // 메뉴 선택을 구문 분석합니다:
-            switch (wmId)
-            {
-            case IDM_ABOUT:
-                DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
-                break;
-            case IDM_EXIT:
-                DestroyWindow(hWnd);
-                break;
-            default:
-                return DefWindowProc(hWnd, message, wParam, lParam);
-            }
-        }
-        break;
+    
     case WM_PAINT:
         {
             PAINTSTRUCT ps;
@@ -185,6 +169,28 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             GraphicsInstance.FillPolygon(&BlueBrush,points,4);
 
             EndPaint(hWnd, &ps);
+        }
+        break;
+    case WM_KEYDOWN:
+        switch (wParam)
+        {
+        case VK_LEFT:
+            OutputDebugStringW(L"왼쪽 누름\n");
+            InvalidateRect(hWnd,nullptr,TRUE); 
+            break;
+        case VK_RIGHT:
+            OutputDebugStringW(L"오른쪽 누름\n");
+            InvalidateRect(hWnd,nullptr,TRUE);  // 창을 다시 그리도록 요청(WM_PAINT 메시지가 들어간다)
+            break;
+        case VK_UP:
+            OutputDebugStringW(L"위쪽 누름\n");
+            break;
+        case VK_DOWN:
+            OutputDebugStringW(L"아래쪽 누름\n");
+            break;
+        case VK_ESCAPE:
+            DestroyWindow(hWnd); // hWnd 창을 닫아라 -> 프로그램을 꺼라(WM_DESTROY메시지가 들어간다.)
+            break;
         }
         break;
     case WM_DESTROY:
