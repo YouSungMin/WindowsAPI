@@ -32,6 +32,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     // TODO: 여기에 코드를 입력합니다.
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 
+    // GDI+ 초기화
+    ULONG_PTR Token;
+    Gdiplus::GdiplusStartupInput StartupInput;
+    Gdiplus::GdiplusStartup(&Token, &StartupInput,nullptr);
+
     // 전역 문자열을 초기화합니다.
     LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
     LoadStringW(hInstance, IDC_WINDOWSAPI, szWindowClass, MAX_LOADSTRING);
@@ -57,6 +62,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         }
     }
 
+    // GDI+ 정리하기
+    Gdiplus::GdiplusShutdown(Token);
     return (int) msg.wParam;
 }
 
@@ -159,6 +166,24 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             PAINTSTRUCT ps;
             HDC hdc = BeginPaint(hWnd, &ps);
             // TODO: 여기에 hdc를 사용하는 그리기 코드를 추가합니다...
+            // Graphics 객체 만들기
+            Gdiplus::Graphics GraphicsInstance(hdc);
+            
+            Gdiplus::Point points[4] = { Gdiplus::Point(0,150), Gdiplus::Point(100,50),Gdiplus::Point(200,50),Gdiplus::Point(300,150) };
+
+            Gdiplus::SolidBrush RedBrush(Gdiplus::Color(255, 255, 0, 0));
+            GraphicsInstance.FillEllipse(&RedBrush, 200, 50, 60, 60);
+
+            Gdiplus::SolidBrush BlueBrush(Gdiplus::Color(255, 0, 0, 255));
+            GraphicsInstance.FillEllipse(&BlueBrush, 0, 50, 60, 60);
+
+            for (int i = 0; i < 200; i += 15)
+            {
+                GraphicsInstance.FillRectangle(&RedBrush, i, 200, 10, 10);
+            }
+            GraphicsInstance.FillRectangle(&BlueBrush, 50, 150, 200, 100);
+            GraphicsInstance.FillPolygon(&BlueBrush,points,4);
+
             EndPaint(hWnd, &ps);
         }
         break;
