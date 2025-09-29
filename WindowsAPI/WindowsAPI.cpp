@@ -22,9 +22,9 @@ LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
-                     _In_opt_ HINSTANCE hPrevInstance,
-                     _In_ LPWSTR    lpCmdLine,
-                     _In_ int       nCmdShow)
+    _In_opt_ HINSTANCE hPrevInstance,
+    _In_ LPWSTR    lpCmdLine,
+    _In_ int       nCmdShow)
 {
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
@@ -35,7 +35,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     // GDI+ 초기화
     ULONG_PTR Token;
     Gdiplus::GdiplusStartupInput StartupInput;
-    Gdiplus::GdiplusStartup(&Token, &StartupInput,nullptr);
+    Gdiplus::GdiplusStartup(&Token, &StartupInput, nullptr);
 
     // 전역 문자열을 초기화합니다.
     LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
@@ -43,7 +43,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     MyRegisterClass(hInstance);
 
     // 애플리케이션 초기화를 수행합니다:
-    if (!InitInstance (hInstance, nCmdShow))
+    if (!InitInstance(hInstance, nCmdShow))
     {
         return FALSE;
     }
@@ -64,7 +64,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     // GDI+ 정리하기
     Gdiplus::GdiplusShutdown(Token);
-    return (int) msg.wParam;
+    return (int)msg.wParam;
 }
 
 
@@ -80,17 +80,17 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 
     wcex.cbSize = sizeof(WNDCLASSEX);
 
-    wcex.style          = CS_HREDRAW | CS_VREDRAW;
-    wcex.lpfnWndProc    = WndProc;  //윈도우 프로시저 함수 등록
-    wcex.cbClsExtra     = 0;
-    wcex.cbWndExtra     = 0;
-    wcex.hInstance      = hInstance;
-    wcex.hIcon          = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_WINDOWSAPI));
-    wcex.hCursor        = LoadCursor(nullptr, IDC_ARROW);
-    wcex.hbrBackground  = (HBRUSH)(COLOR_WINDOW+1);
-    wcex.lpszMenuName   = NULL; //MAKEINTRESOURCEW(IDC_WINDOWSAPI); // 메뉴 제거
-    wcex.lpszClassName  = szWindowClass;
-    wcex.hIconSm        = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
+    wcex.style = CS_HREDRAW | CS_VREDRAW;
+    wcex.lpfnWndProc = WndProc;  //윈도우 프로시저 함수 등록
+    wcex.cbClsExtra = 0;
+    wcex.cbWndExtra = 0;
+    wcex.hInstance = hInstance;
+    wcex.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_WINDOWSAPI));
+    wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
+    wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+    wcex.lpszMenuName = NULL; //MAKEINTRESOURCEW(IDC_WINDOWSAPI); // 메뉴 제거
+    wcex.lpszClassName = szWindowClass;
+    wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
 
     return RegisterClassExW(&wcex);
 }
@@ -107,27 +107,27 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 //
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
-   hInst = hInstance; // 인스턴스 핸들을 전역 변수에 저장합니다.
-   
-   //실제 윈도우 생성
-   HWND hWnd = CreateWindowW(szWindowClass,
-       L"2D Shooting for GDI+", 
-       WS_OVERLAPPEDWINDOW & ~WS_MAXIMIZEBOX & ~WS_THICKFRAME, 
-       //WS_OVERLAPPEDWINDOW 에서 
-       //~WS_MAXIMIZEBOX(최대화 버튼 비활성화) 와 ~WS_THICKFRAME(테두리잡고 크기변경 금지)
-       1000, 100, // 시작 좌표 (스크린 좌표계)
-       400, 300,  // 크기
-      nullptr, nullptr, hInstance, nullptr);
+    hInst = hInstance; // 인스턴스 핸들을 전역 변수에 저장합니다.
 
-   if (!hWnd)
-   {
-      return FALSE;
-   }
+    //실제 윈도우 생성
+    HWND hWnd = CreateWindowW(szWindowClass,
+        L"2D Shooting for GDI+",
+        WS_OVERLAPPEDWINDOW & ~WS_MAXIMIZEBOX & ~WS_THICKFRAME,
+        //WS_OVERLAPPEDWINDOW 에서 
+        //~WS_MAXIMIZEBOX(최대화 버튼 비활성화) 와 ~WS_THICKFRAME(테두리잡고 크기변경 금지)
+        1000, 100, // 시작 좌표 (스크린 좌표계)
+        1000, 1000,  // 크기
+        nullptr, nullptr, hInstance, nullptr);
 
-   ShowWindow(hWnd, nCmdShow);
-   UpdateWindow(hWnd);
+    if (!hWnd)
+    {
+        return FALSE;
+    }
 
-   return TRUE;
+    ShowWindow(hWnd, nCmdShow);
+    UpdateWindow(hWnd);
+
+    return TRUE;
 }
 
 //
@@ -142,56 +142,71 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+    PAINTSTRUCT ps;
+    HDC hdc = BeginPaint(hWnd, &ps);
+    Gdiplus::Graphics GraphicsInstance(hdc);
+    Gdiplus::SolidBrush BlueBrush(Gdiplus::Color(255, 0, 0, 255));
+    static int x = 150, y = 50;
+    Gdiplus::Point points[4] = { Gdiplus::Point(y - 50,x), Gdiplus::Point(y + 50,x - 100),Gdiplus::Point(y + 150,x - 100),Gdiplus::Point(y + 250,x) };
+    static bool flag = false;
     switch (message)
     {
-    
+
     case WM_PAINT:
-        {
-            PAINTSTRUCT ps;
-            HDC hdc = BeginPaint(hWnd, &ps);
-            // TODO: 여기에 hdc를 사용하는 그리기 코드를 추가합니다...
-            // Graphics 객체 만들기
-            Gdiplus::Graphics GraphicsInstance(hdc);
-            
-            Gdiplus::Point points[4] = { Gdiplus::Point(0,150), Gdiplus::Point(100,50),Gdiplus::Point(200,50),Gdiplus::Point(300,150) };
+    {
+        // TODO: 여기에 hdc를 사용하는 그리기 코드를 추가합니다...
+        // Graphics 객체 만들기
 
-            Gdiplus::SolidBrush RedBrush(Gdiplus::Color(255, 255, 0, 0));
-            GraphicsInstance.FillEllipse(&RedBrush, 200, 50, 60, 60);
+        GraphicsInstance.FillRectangle(&BlueBrush, y, x, 200, 100);
+        GraphicsInstance.FillPolygon(&BlueBrush, points, 4);
 
-            Gdiplus::SolidBrush BlueBrush(Gdiplus::Color(255, 0, 0, 255));
-            GraphicsInstance.FillEllipse(&BlueBrush, 0, 50, 60, 60);
+        //Gdiplus::SolidBrush RedBrush(Gdiplus::Color(255, 255, 0, 0));
+        //GraphicsInstance.FillEllipse(&RedBrush, 200, 50, 60, 60);
 
-            for (int i = 0; i < 200; i += 15)
-            {
-                GraphicsInstance.FillRectangle(&RedBrush, i, 200, 10, 10);
-            }
-            GraphicsInstance.FillRectangle(&BlueBrush, 50, 150, 200, 100);
-            GraphicsInstance.FillPolygon(&BlueBrush,points,4);
+        //GraphicsInstance.FillEllipse(&BlueBrush, 0, 50, 60, 60);
 
-            EndPaint(hWnd, &ps);
-        }
-        break;
+        //for (int i = 0; i < 200; i += 15)
+        //{
+        //    GraphicsInstance.FillRectangle(&RedBrush, i, 200, 10, 10);
+        //}
+
+        EndPaint(hWnd, &ps);
+    }
+    break;
     case WM_KEYDOWN:
+        if (flag) {
+            return 0;
+        }
+        flag = true;
         switch (wParam)
         {
         case VK_LEFT:
             OutputDebugStringW(L"왼쪽 누름\n");
-            InvalidateRect(hWnd,nullptr,TRUE); 
+            y -= 50;
+            InvalidateRect(hWnd, nullptr, TRUE);
             break;
         case VK_RIGHT:
             OutputDebugStringW(L"오른쪽 누름\n");
-            InvalidateRect(hWnd,nullptr,TRUE);  // 창을 다시 그리도록 요청(WM_PAINT 메시지가 들어간다)
+            y += 50;
+            InvalidateRect(hWnd, nullptr, TRUE);  // 창을 다시 그리도록 요청(WM_PAINT 메시지가 들어간다)
             break;
         case VK_UP:
             OutputDebugStringW(L"위쪽 누름\n");
+            x -= 50;
+            InvalidateRect(hWnd, nullptr, TRUE);
             break;
         case VK_DOWN:
             OutputDebugStringW(L"아래쪽 누름\n");
+            x += 50;
+            InvalidateRect(hWnd, nullptr, TRUE);
             break;
         case VK_ESCAPE:
             DestroyWindow(hWnd); // hWnd 창을 닫아라 -> 프로그램을 꺼라(WM_DESTROY메시지가 들어간다.)
             break;
         }
+        break;
+    case WM_KEYUP:
+        flag = false;
         break;
     case WM_DESTROY:
         PostQuitMessage(0);
