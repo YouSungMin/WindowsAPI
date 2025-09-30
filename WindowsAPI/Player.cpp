@@ -45,7 +45,8 @@ void Player::Render(Gdiplus::Graphics* InGraphics)
         Gdiplus::SolidBrush RedBrush(Gdiplus::Color(255, 255, 0, 0));
         InGraphics->FillEllipse(
             &RedBrush,
-            100, 100,
+            static_cast<int>(Position.X - PixelSize * Pivot.X),
+            static_cast<int>(Position.Y - PixelSize * Pivot.Y),
             PixelSize, PixelSize);
     }
 }

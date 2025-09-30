@@ -3,6 +3,7 @@
 
 #include "framework.h"
 #include "WindowsAPI.h"
+#include "BackGround.h"
 
 
 //#include <crtdbg.h>
@@ -21,13 +22,13 @@ HWND g_hMainWindow = nullptr;
 Gdiplus::Point g_AppPosition(1000,100);
 Gdiplus::Point g_ScreenSize(600,800);
 
-Gdiplus::Point g_HousePosition(100, 100);
+//Gdiplus::Point g_HousePosition(100, 100);
 //::Point g_PlayerPosition(500, 300);
-constexpr int g_HouseVerticesCount = 7;
-const Gdiplus::Point g_HouseVertices[g_HouseVerticesCount] =
-{
-    {0,-100},{50,-50},{30,-50},{30,0},{-30,0},{-30,-50},{-50,-50}
-};
+//constexpr int g_HouseVerticesCount = 7;
+//const Gdiplus::Point g_HouseVertices[g_HouseVerticesCount] =
+//{
+//    {0,-100},{50,-50},{30,-50},{30,0},{-30,0},{-30,-50},{-50,-50}
+//};
 //bool g_bKeyWasPressed
 
 Gdiplus::Bitmap* g_BackBuffer = nullptr;    // 백버퍼용 종이
@@ -36,6 +37,9 @@ Gdiplus::Graphics* g_BackBufferGraphics = nullptr;  // 백버퍼 종이에 그�
 //Gdiplus::Bitmap* g_PlayerImage = nullptr;   // 플레이어가 그려질 종이
 
 Player* g_Player = nullptr;
+BackGround* g_BackGround = nullptr;
+BackGround* g_BackGround2 = nullptr;
+
 // 이 코드 모듈에 포함된 함수의 선언을 전달합니다:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
@@ -57,7 +61,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     ULONG_PTR Token;
     Gdiplus::GdiplusStartupInput StartupInput;
     Gdiplus::GdiplusStartup(&Token, &StartupInput, nullptr);
+    g_BackGround = new BackGround(L"./Images/purple.png",0.0f);
+    g_BackGround2 = new BackGround(L"./Images/purple.png",-800.0f);
     g_Player = new Player(L"./Images/playerShip1_blue.png");
+
 
     // 전역 문자열을 초기화합니다.
     LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
@@ -87,10 +94,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                 DispatchMessage(&msg);
             }
         }
+        InvalidateRect(g_hMainWindow, nullptr, FALSE);
     }
 
     delete g_Player;
     g_Player = nullptr;
+    delete g_BackGround;
+    g_BackGround = nullptr;
     // GDI+ 정리하기
     Gdiplus::GdiplusShutdown(Token);
     return (int)msg.wParam;
@@ -205,10 +215,16 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         if (g_BackBufferGraphics)   // g_BackBufferGraphics 필수
         {
             g_BackBufferGraphics->Clear(Gdiplus::Color(255, 0, 0, 0));
-            Gdiplus::SolidBrush GreenBrush(Gdiplus::Color(255, 0, 255, 0));
             Gdiplus::SolidBrush BlueBrush(Gdiplus::Color(255, 0, 0, 255));
             Gdiplus::SolidBrush YelloBrush(Gdiplus::Color(255, 255, 255, 0));
 
+            //Gdiplus::Point Positions[g_HouseVerticesCount];
+            //for (int i = 0; i < g_HouseVerticesCount; i++)
+            //{
+            //    Positions[i] = g_HousePosition + g_HouseVertices[i];
+            //}
+            g_BackGround->BackGroundRender(g_BackBufferGraphics);
+            g_BackGround2->BackGroundRender(g_BackBufferGraphics);
             for (int y = 0; y < 16; y++)
             {
                 for (int x = 0; x < 12; x++)
@@ -216,16 +232,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     g_BackBufferGraphics->FillRectangle(&YelloBrush, 50 * x, 50 * y, 5, 5);
                 }
             }
-
-            Gdiplus::Pen GreenPen(Gdiplus::Color(255, 0, 255, 0), 2.0f);
-            Gdiplus::Point Positions[g_HouseVerticesCount];
-            for (int i = 0; i < g_HouseVerticesCount; i++)
-            {
-                Positions[i] = g_HousePosition + g_HouseVertices[i];
-            }
-            g_BackBufferGraphics->DrawPolygon(&GreenPen, Positions, g_HouseVerticesCount);
             g_Player->Render(g_BackBufferGraphics);
-            
+
             Gdiplus::Graphics GraphicsInstance(hdc);    // Graphics객체 만들기(hdc에 그리기 위한 도구 만들기)
             GraphicsInstance.DrawImage(g_BackBuffer, 0, 0);
         }
