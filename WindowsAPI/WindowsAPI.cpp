@@ -15,6 +15,10 @@ HINSTANCE hInst;                                // 현재 인스턴스입니다.
 WCHAR szTitle[MAX_LOADSTRING];                  // 제목 표시줄 텍스트입니다.
 WCHAR szWindowClass[MAX_LOADSTRING];            // 기본 창 클래스 이름입니다.
 
+Gdiplus::Point g_AppPosition(1000,100);
+Gdiplus::Point g_ScreenSize(800,600);
+
+
 // 이 코드 모듈에 포함된 함수의 선언을 전달합니다:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
@@ -109,14 +113,19 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
     hInst = hInstance; // 인스턴스 핸들을 전역 변수에 저장합니다.
 
+    //클라이언트 영역의 크기를 원하는 크기로 조절하기
+    RECT rc = {0,0, g_ScreenSize.X, g_ScreenSize.Y};
+
+    AdjustWindowRectEx(&rc, WS_OVERLAPPEDWINDOW & ~WS_MAXIMIZEBOX & ~WS_THICKFRAME, FALSE, 0);
+
     //실제 윈도우 생성
     HWND hWnd = CreateWindowW(szWindowClass,
         L"2D Shooting for GDI+",
         WS_OVERLAPPEDWINDOW & ~WS_MAXIMIZEBOX & ~WS_THICKFRAME,
         //WS_OVERLAPPEDWINDOW 에서 
         //~WS_MAXIMIZEBOX(최대화 버튼 비활성화) 와 ~WS_THICKFRAME(테두리잡고 크기변경 금지)
-        1000, 100, // 시작 좌표 (스크린 좌표계)
-        1000, 1000,  // 크기
+        g_AppPosition.X, g_AppPosition.Y, // 시작 좌표 (스크린 좌표계)
+        rc.right- rc.left, rc.bottom - rc.top,  // 크기 (윈도우 스타일에 맞춰 재조정된 크기)
         nullptr, nullptr, hInstance, nullptr);
 
     if (!hWnd)

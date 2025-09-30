@@ -127,6 +127,7 @@
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="WindowsAPI.h" />
+    <ClInclude Include="enums.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WindowsAPI.cpp" />
