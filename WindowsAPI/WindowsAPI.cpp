@@ -29,7 +29,10 @@ std::unordered_map<InputDirection, bool> g_KeyWasPressedMap;
 
 Gdiplus::Bitmap* g_BackBuffer = nullptr;    // 백버퍼용 종이
 Gdiplus::Graphics* g_BackBufferGraphics = nullptr;  // 백버퍼 종이에 그리기 위한 도구
+constexpr int PlayerImageSize = 64;
 
+
+Gdiplus::Bitmap* g_PlayerImage = nullptr;   // 플레이어가 그려질 종이
 // 이 코드 모듈에 포함된 함수의 선언을 전달합니다:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
@@ -173,9 +176,20 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             // 혹시 안만들어졌을 때를 대비한 에러 출력
             MessageBox(hWnd,L"백 버퍼 그래픽스 생성 실패",L"오류", MB_OK | MB_ICONERROR);
         }
+
+        g_PlayerImage = new Gdiplus::Bitmap(L"./Images/playerShip1_blue.png");
+        if (g_PlayerImage->GetLastStatus() != Gdiplus::Ok)
+        {
+            // 정상적으로 파일이 로딩이 안됐다.
+            delete g_PlayerImage;   //실패했으니 즉시 해제
+            g_PlayerImage = nullptr;
+            MessageBox(hWnd, L"플레이어 이미지 로드 실패", L"오류", MB_OK | MB_ICONERROR);
+        }
         break;
     case WM_DESTROY:
         PostQuitMessage(0);
+        delete g_PlayerImage;
+        g_PlayerImage = nullptr;
         delete g_BackBufferGraphics;
         g_BackBufferGraphics = nullptr;
         delete g_BackBuffer;
@@ -191,6 +205,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         if (g_BackBufferGraphics)
         {
             g_BackBufferGraphics->Clear(Gdiplus::Color(255, 0, 0, 0));
+
             Gdiplus::SolidBrush GreenBrush(Gdiplus::Color(255, 0, 255, 0));
             Gdiplus::SolidBrush BlueBrush(Gdiplus::Color(255, 0, 0, 255));
             Gdiplus::SolidBrush YelloBrush(Gdiplus::Color(255, 255, 255, 0));
@@ -212,6 +227,22 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             g_BackBufferGraphics->DrawPolygon(&GreenPen, Positions, g_HouseVerticesCount);
             //g_BackBufferGraphics->FillPolygon(&GreenBrush, Positions, g_HouseVerticesCount);
 
+            if(g_PlayerImage)
+            {
+                // g_PlayerImage 가 로딩되어 있다.
+                g_BackBufferGraphics->DrawImage(
+                g_PlayerImage,  //그려질 이미지
+                100, 100,   //그려질 위치
+                PlayerImageSize, PlayerImageSize);   //그려질 사이즈
+            }
+            else
+            {
+                Gdiplus::SolidBrush RedBrush(Gdiplus::Color(255, 255, 0, 0));
+                g_BackBufferGraphics->FillEllipse(
+                    &RedBrush,
+                    100, 100,
+                    PlayerImageSize, PlayerImageSize);
+            }
             Gdiplus::Graphics GraphicsInstance(hdc);    // Graphics객체 만들기(hdc에 그리기 위한 도구 만들기)
             GraphicsInstance.DrawImage(g_BackBuffer, 0, 0);
         }
