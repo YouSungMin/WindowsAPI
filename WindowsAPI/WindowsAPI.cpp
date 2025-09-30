@@ -4,9 +4,9 @@
 #include "framework.h"
 #include "WindowsAPI.h"
 
-#include <crtdbg.h>
-#define _CRTDBG_MAP_ALLOC
-#define new new(_NORMAL_BLOCK,__FILE__,__LINE__)
+//#include <crtdbg.h>
+//#define _CRTDBG_MAP_ALLOC
+//#define new new(_NORMAL_BLOCK,__FILE__,__LINE__)
 
 #define MAX_LOADSTRING 100
 
@@ -18,6 +18,17 @@ WCHAR szWindowClass[MAX_LOADSTRING];            // 기본 창 클래스 이름�
 Gdiplus::Point g_AppPosition(1000,100);
 Gdiplus::Point g_ScreenSize(800,600);
 
+Gdiplus::Point g_HousePosition(100, 100);
+constexpr int g_HouseVerticesCount = 7;
+const Gdiplus::Point g_HouseVertices[g_HouseVerticesCount] =
+{
+    {0,-100},{50,-50},{30,-50},{30,0},{-30,0},{-30,-50},{-50,-50}
+};
+//bool g_bKeyWasPressed
+std::unordered_map<InputDirection, bool> g_KeyWasPressedMap;
+
+Gdiplus::Bitmap* g_BackBuffer = nullptr;    // 백버퍼용 종이
+Gdiplus::Graphics* g_BackBufferGraphics = nullptr;  // 백버퍼 종이에 그리기 위한 도구
 
 // 이 코드 모듈에 포함된 함수의 선언을 전달합니다:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
@@ -151,74 +162,125 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    PAINTSTRUCT ps;
-    HDC hdc = BeginPaint(hWnd, &ps);
-    Gdiplus::Graphics GraphicsInstance(hdc);
-    Gdiplus::SolidBrush BlueBrush(Gdiplus::Color(255, 0, 0, 255));
-    static int x = 150, y = 50;
-    Gdiplus::Point points[4] = { Gdiplus::Point(y - 50,x), Gdiplus::Point(y + 50,x - 100),Gdiplus::Point(y + 150,x - 100),Gdiplus::Point(y + 250,x) };
-    static bool flag = false;
     switch (message)
     {
-
-    case WM_PAINT:
-    {
-        // TODO: 여기에 hdc를 사용하는 그리기 코드를 추가합니다...
-        // Graphics 객체 만들기
-
-        GraphicsInstance.FillRectangle(&BlueBrush, y, x, 200, 100);
-        GraphicsInstance.FillPolygon(&BlueBrush, points, 4);
-
-        //Gdiplus::SolidBrush RedBrush(Gdiplus::Color(255, 255, 0, 0));
-        //GraphicsInstance.FillEllipse(&RedBrush, 200, 50, 60, 60);
-
-        //GraphicsInstance.FillEllipse(&BlueBrush, 0, 50, 60, 60);
-
-        //for (int i = 0; i < 200; i += 15)
-        //{
-        //    GraphicsInstance.FillRectangle(&RedBrush, i, 200, 10, 10);
-        //}
-
-        EndPaint(hWnd, &ps);
-    }
-    break;
-    case WM_KEYDOWN:
-        if (flag) {
-            return 0;
-        }
-        flag = true;
-        switch (wParam)
+    case WM_CREATE:
+        // 윈도우가 생성되었을때 날아오는 메시지
+        g_BackBuffer = new Gdiplus::Bitmap(g_ScreenSize.X, g_ScreenSize.Y,PixelFormat32bppARGB);
+        g_BackBufferGraphics = Gdiplus::Graphics::FromImage(g_BackBuffer);
+        if (!g_BackBufferGraphics)
         {
-        case VK_LEFT:
-            OutputDebugStringW(L"왼쪽 누름\n");
-            y -= 50;
-            InvalidateRect(hWnd, nullptr, TRUE);
-            break;
-        case VK_RIGHT:
-            OutputDebugStringW(L"오른쪽 누름\n");
-            y += 50;
-            InvalidateRect(hWnd, nullptr, TRUE);  // 창을 다시 그리도록 요청(WM_PAINT 메시지가 들어간다)
-            break;
-        case VK_UP:
-            OutputDebugStringW(L"위쪽 누름\n");
-            x -= 50;
-            InvalidateRect(hWnd, nullptr, TRUE);
-            break;
-        case VK_DOWN:
-            OutputDebugStringW(L"아래쪽 누름\n");
-            x += 50;
-            InvalidateRect(hWnd, nullptr, TRUE);
-            break;
-        case VK_ESCAPE:
-            DestroyWindow(hWnd); // hWnd 창을 닫아라 -> 프로그램을 꺼라(WM_DESTROY메시지가 들어간다.)
-            break;
+            // 혹시 안만들어졌을 때를 대비한 에러 출력
+            MessageBox(hWnd,L"백 버퍼 그래픽스 생성 실패",L"오류", MB_OK | MB_ICONERROR);
         }
-        break;
-    case WM_KEYUP:
-        flag = false;
         break;
     case WM_DESTROY:
         PostQuitMessage(0);
+        delete g_BackBufferGraphics;
+        g_BackBufferGraphics = nullptr;
+        delete g_BackBuffer;
+        g_BackBuffer = nullptr;
+        PostQuitMessage(0);
+        break;
+    case WM_PAINT:
+    {
+        PAINTSTRUCT ps;
+        HDC hdc = BeginPaint(hWnd, &ps);
+
+        // g_BackBufferGraphics 필수
+        if (g_BackBufferGraphics)
+        {
+            g_BackBufferGraphics->Clear(Gdiplus::Color(255, 0, 0, 0));
+            Gdiplus::SolidBrush GreenBrush(Gdiplus::Color(255, 0, 255, 0));
+            Gdiplus::SolidBrush BlueBrush(Gdiplus::Color(255, 0, 0, 255));
+            Gdiplus::SolidBrush YelloBrush(Gdiplus::Color(255, 255, 255, 0));
+
+            for (int y = 0; y < 2; y++)
+            {
+                for (int x = 0; x < 10; x++)
+                {
+                    g_BackBufferGraphics->FillRectangle(&YelloBrush, 30 + 70 * x, 50 + 70 * y, 60, 60);
+                }
+            }
+
+            Gdiplus::Pen GreenPen(Gdiplus::Color(255, 0, 255, 0), 2.0f);
+            Gdiplus::Point Positions[g_HouseVerticesCount];
+            for (int i = 0; i < g_HouseVerticesCount; i++)
+            {
+                Positions[i] = g_HousePosition + g_HouseVertices[i];
+            }
+            g_BackBufferGraphics->DrawPolygon(&GreenPen, Positions, g_HouseVerticesCount);
+            //g_BackBufferGraphics->FillPolygon(&GreenBrush, Positions, g_HouseVerticesCount);
+
+            Gdiplus::Graphics GraphicsInstance(hdc);    // Graphics객체 만들기
+            GraphicsInstance.DrawImage(g_BackBuffer, 0, 0);
+        }
+        EndPaint(hWnd, &ps);
+    }
+    break;
+    case WM_ERASEBKGND:
+        // 화면을 지워야 할 때 날라온 메시지
+        return 1;   // 배경 지우기 방지(백버퍼를 사용하기 있기 때문에)
+    case WM_KEYDOWN:
+        switch (wParam)
+        {
+        case VK_LEFT:
+            //if (!g_KeyWasPressedMap[static_cast<InputDirection>(wParam)])
+        {
+            g_KeyWasPressedMap[static_cast<InputDirection>(wParam)] = true;
+            OutputDebugStringW(L"왼쪽키를 눌렀다.\n");
+            g_HousePosition.X -= 10;
+            InvalidateRect(hWnd, nullptr, FALSE);    // 창을 다시 그리도록 요청(WM_PAINT 메시지가 들어간다)
+        }
+        break;
+        case VK_RIGHT:
+            //if (!g_KeyWasPressedMap[static_cast<InputDirection>(wParam)])
+        {
+            g_KeyWasPressedMap[static_cast<InputDirection>(wParam)] = true;
+            OutputDebugStringW(L"오른쪽키를 눌렀다.\n");
+            g_HousePosition.X += 10;
+            InvalidateRect(hWnd, nullptr, FALSE);    //FALSE로 WM_ERASEBKGND 발동 안되게 하기
+        }
+        break;
+        case VK_UP:
+            //if (!g_KeyWasPressedMap[static_cast<InputDirection>(wParam)])
+        {
+            g_KeyWasPressedMap[static_cast<InputDirection>(wParam)] = true;
+            OutputDebugStringW(L"위쪽키를 눌렀다.\n");
+            g_HousePosition.Y -= 10;
+            InvalidateRect(hWnd, nullptr, FALSE);
+        }
+        break;
+        case VK_DOWN:
+            //if (!g_KeyWasPressedMap[static_cast<InputDirection>(wParam)])
+        {
+            g_KeyWasPressedMap[static_cast<InputDirection>(wParam)] = true;
+            OutputDebugStringW(L"아래쪽키를 눌렀다.\n");
+            g_HousePosition.Y += 10;
+            InvalidateRect(hWnd, nullptr, FALSE);
+        }
+        break;
+        case VK_ESCAPE:
+            DestroyWindow(hWnd);    // hWnd 창을 닫아라 -> 프로그램을 꺼라(WM_DESTROY메시지가 들어간다.)
+        }
+        break;
+    case WM_KEYUP:
+        g_KeyWasPressedMap[static_cast<InputDirection>(wParam)] = false;    // 키가 떨어졌다고 표시
+        switch (wParam)
+        {
+        case VK_LEFT:
+            OutputDebugStringW(L"왼쪽키를 땠다.\n");
+            break;
+        case VK_RIGHT:
+            OutputDebugStringW(L"오른쪽키를 땠다.\n");
+            break;
+        case VK_UP:
+            OutputDebugStringW(L"위쪽키를 땠다.\n");
+            break;
+        case VK_DOWN:
+            OutputDebugStringW(L"아래쪽키를 땠다.\n");
+            break;
+        }
         break;
     default:
         return DefWindowProc(hWnd, message, wParam, lParam);

@@ -3,8 +3,8 @@
 
 enum class InputDirection : uint8_t
 {
-	Up,
-	Down,
-	Left,
-	Right
+	Up = VK_UP,
+	Down = VK_DOWN,
+	Left = VK_LEFT,
+	Right = VK_RIGHT
 };
