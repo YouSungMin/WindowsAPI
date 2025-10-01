@@ -1,7 +1,7 @@
 #pragma once
 #include <Windows.h>
 #include <gdiplus.h>
-using PointF = Gdiplus::PointF;
+#include "enums.h"
 
-extern HWND g_hMainWindow;
-extern Gdiplus::Point g_ScreenSize;
+using PointF = Gdiplus::PointF;
+using Point = Gdiplus::Point;

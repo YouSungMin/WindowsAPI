@@ -15,11 +15,13 @@ public:
 	inline const PointF& GetPosition() const{ return Position; }
 	inline int GetSize() const { return Size; }
 	inline const PointF& GetPivot() const { return Pivot; }
+	inline RenderLayer GetRenderLayer() { return TargetRenderLayer; }
 
 	//Setter
 	inline void SetPosition(float InX, float InY) { Position.X = InX; Position.Y = InY; }
 	inline void SetSize(int InSize) { Size = InSize; }
 	inline void SetPivot(float InX, float InY) { Pivot.X = InX; Pivot.Y = InY; }
+	inline void SetRenderLayer(RenderLayer InLayer) { TargetRenderLayer = InLayer; }
 
 protected:
 	// 그려질 크기
@@ -33,5 +35,7 @@ protected:
 
 	// 플레이어 이미지가 들어있을 비트맵
 	Gdiplus::Bitmap* Image = nullptr;   // 플레이어가 그려질 종이
+
+	RenderLayer TargetRenderLayer = RenderLayer::Misc;
 };
 

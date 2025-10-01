@@ -7,3 +7,9 @@
 #include "Player.h"
 
 #include "BackGround.h"
+
+#include "TestActor.h"
+
+#include "TestHouseActor.h"
+
+#include "GameManager.h"

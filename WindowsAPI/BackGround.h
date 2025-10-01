@@ -5,9 +5,9 @@ class BackGround : public Actor
 {
 public:
 	BackGround() = delete;
-	//BackGround(const wchar_t* InImagePath,float InY);
 	BackGround(const wchar_t* InImagePath);
 	~BackGround()override{};
+	//BackGround(const wchar_t* InImagePath,float InY);
 
 	virtual void OnRender(Gdiplus::Graphics* InGraphics)override;
 	virtual void OnTick(float InDeltaTime)override;

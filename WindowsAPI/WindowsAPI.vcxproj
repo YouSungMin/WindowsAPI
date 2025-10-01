@@ -127,16 +127,24 @@
     <ClInclude Include="BackGround.h" />
     <ClInclude Include="Common.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="GameManager.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Resource.h" />
+    <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="TestActor.h" />
+    <ClInclude Include="TestHouseActor.h" />
     <ClInclude Include="WindowsAPI.h" />
     <ClInclude Include="enums.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Actor.cpp" />
     <ClCompile Include="BackGround.cpp" />
+    <ClCompile Include="GameManager.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="ResourceManager.cpp" />
+    <ClCompile Include="TestActor.cpp" />
+    <ClCompile Include="TestHouseActor.cpp" />
     <ClCompile Include="WindowsAPI.cpp" />
   </ItemGroup>
   <ItemGroup>
