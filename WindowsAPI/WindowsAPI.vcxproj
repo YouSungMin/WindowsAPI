@@ -123,6 +123,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Actor.h" />
     <ClInclude Include="BackGround.h" />
     <ClInclude Include="Common.h" />
     <ClInclude Include="framework.h" />
@@ -133,6 +134,7 @@
     <ClInclude Include="enums.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Actor.cpp" />
     <ClCompile Include="BackGround.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="WindowsAPI.cpp" />

@@ -1,40 +1,30 @@
 #pragma once
-#include <unordered_map>
-#include "Common.h"
+#include "Actor.h"
 #include "enums.h"
-
+#include <unordered_map>
 
 // extern : HWND g_hMainWindow 가 다른 파일에 선언되어있다.
 
-class Player
+class Player : public Actor
 {
 public:
 	Player() = delete;
 	Player(const wchar_t* InImagePath);
-	~Player();
+	~Player()override{};
 
-	void Render(Gdiplus::Graphics* InGraphics);
+	void OnRender(Gdiplus::Graphics* InGraphics)override;
+	virtual void OnTick(float InDeltaTime)override;
+
 	void HandleKeyState(WPARAM InKey, bool InIsPressed);
-	void Tick(float InDeltaTime);
+
+	inline float GetSpeed() const { return Speed; }
+	inline void SetSpeed(float InSpeed) { Speed = InSpeed; }
 
 private:
-	// 플레이어가 그려질 크기
-	static constexpr int PixelSize = 64;
-
 	// 플레이어 키 입력 상태
 	std::unordered_map<InputDirection, bool> KeyWasPressedMap;
 
-	// 플레이어의 중심점
-	PointF Pivot = {0.5f , 0.5f};	//Pivot 기본 값은 한가운데
-
-	//플레이어의 위치
-	PointF Position{ 0.0f, 0.0f };
-
-	//플레이어의 이동 속도
+	////플레이어의 이동 속도
 	float Speed = 150.0f;
-
-
-	// 플레이어 이미지가 들어있을 비트맵
-	Gdiplus::Bitmap* Image = nullptr;   // 플레이어가 그려질 종이
 };
 

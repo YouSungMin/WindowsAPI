@@ -1,29 +1,21 @@
 #pragma once
+#include "Actor.h"
 
-#include "Common.h"
-
-class BackGround
+class BackGround : public Actor
 {
 public:
 	BackGround() = delete;
 	//BackGround(const wchar_t* InImagePath,float InY);
 	BackGround(const wchar_t* InImagePath);
-	~BackGround();
+	~BackGround()override{};
 
-	void BackGroundRender(Gdiplus::Graphics* InGraphics);
+	virtual void OnRender(Gdiplus::Graphics* InGraphics)override;
+	virtual void OnTick(float InDeltaTime)override;
 
-	void Tick(float InDeltaTime);
 
 private:
-	static constexpr int PixelSize = 64;
-
-	Gdiplus::Bitmap* Image = nullptr;   // 플레이어가 그려질 종이
-
-	float Speed = 50.0f;
-
-	PointF Position{ 0.0f, 0.0f };
-
-	PointF Pivot = { 0.5f , 0.5f };
+	// 배경화면 스크롤 속도
+	float ScrollSpeed = 50.0f;
 
 	float Offset = 0.0f;
 };

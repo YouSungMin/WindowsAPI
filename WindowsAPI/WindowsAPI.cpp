@@ -98,8 +98,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         ULONGLONG CurrentTime = GetTickCount64();
         float DeltaTime = (CurrentTime - LastTime) / 1000.0f; //결과를 초 단위로 변경
         LastTime = CurrentTime;
-        g_BackGround->Tick(DeltaTime);
-        g_Player->Tick(DeltaTime);
+        g_BackGround->OnTick(DeltaTime);
+        g_Player->OnTick(DeltaTime);
         InvalidateRect(g_hMainWindow, nullptr, FALSE);
     }
 
@@ -229,7 +229,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             //{
             //    Positions[i] = g_HousePosition + g_HouseVertices[i];
             //}
-            g_BackGround->BackGroundRender(g_BackBufferGraphics);
+            g_BackGround->OnRender(g_BackBufferGraphics);
             //g_BackGround2->BackGroundRender(g_BackBufferGraphics);
             for (int y = 0; y < 16; y++)
             {
@@ -238,7 +238,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     g_BackBufferGraphics->FillRectangle(&YelloBrush, 50 * x, 50 * y, 5, 5);
                 }
             }
-            g_Player->Render(g_BackBufferGraphics);
+            g_Player->OnRender(g_BackBufferGraphics);
 
             Gdiplus::Graphics GraphicsInstance(hdc);    // Graphics객체 만들기(hdc에 그리기 위한 도구 만들기)
             GraphicsInstance.DrawImage(g_BackBuffer, 0, 0);
