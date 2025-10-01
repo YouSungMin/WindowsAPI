@@ -3,7 +3,7 @@
 
 #include "framework.h"
 #include "WindowsAPI.h"
-#include "BackGround.h"
+
 
 
 //#include <crtdbg.h>
@@ -38,7 +38,7 @@ Gdiplus::Graphics* g_BackBufferGraphics = nullptr;  // 백버퍼 종이에 그�
 
 Player* g_Player = nullptr;
 BackGround* g_BackGround = nullptr;
-BackGround* g_BackGround2 = nullptr;
+//BackGround* g_BackGround2 = nullptr;
 
 // 이 코드 모듈에 포함된 함수의 선언을 전달합니다:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
@@ -61,8 +61,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     ULONG_PTR Token;
     Gdiplus::GdiplusStartupInput StartupInput;
     Gdiplus::GdiplusStartup(&Token, &StartupInput, nullptr);
-    g_BackGround = new BackGround(L"./Images/purple.png",0.0f);
-    g_BackGround2 = new BackGround(L"./Images/purple.png",-800.0f);
+    g_BackGround = new BackGround(L"./Images/purple.png");
+    //g_BackGround2 = new BackGround(L"./Images/purple.png",-800.0f);
     g_Player = new Player(L"./Images/playerShip1_blue.png");
 
 
@@ -80,6 +80,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_WINDOWSAPI));
 
     MSG msg;
+    ULONGLONG LastTime = GetTickCount64();
 
     // 기본 메시지 루프입니다:
     while (true)
@@ -94,13 +95,18 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                 DispatchMessage(&msg);
             }
         }
+        ULONGLONG CurrentTime = GetTickCount64();
+        float DeltaTime = (CurrentTime - LastTime) / 1000.0f; //결과를 초 단위로 변경
+        LastTime = CurrentTime;
+        g_BackGround->Tick(DeltaTime);
+        g_Player->Tick(DeltaTime);
         InvalidateRect(g_hMainWindow, nullptr, FALSE);
     }
 
-    delete g_Player;
-    g_Player = nullptr;
     delete g_BackGround;
     g_BackGround = nullptr;
+    delete g_Player;
+    g_Player = nullptr;
     // GDI+ 정리하기
     Gdiplus::GdiplusShutdown(Token);
     return (int)msg.wParam;
@@ -224,7 +230,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             //    Positions[i] = g_HousePosition + g_HouseVertices[i];
             //}
             g_BackGround->BackGroundRender(g_BackBufferGraphics);
-            g_BackGround2->BackGroundRender(g_BackBufferGraphics);
+            //g_BackGround2->BackGroundRender(g_BackBufferGraphics);
             for (int y = 0; y < 16; y++)
             {
                 for (int x = 0; x < 12; x++)

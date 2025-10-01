@@ -1,14 +1,10 @@
 #pragma once
 #include <unordered_map>
-#include <Windows.h>
-#include <gdiplus.h>
+#include "Common.h"
 #include "enums.h"
 
 
 // extern : HWND g_hMainWindow 가 다른 파일에 선언되어있다.
-extern HWND g_hMainWindow;
-extern Gdiplus::Point g_ScreenSize;
-using PointF = Gdiplus::PointF;
 
 class Player
 {
@@ -19,8 +15,12 @@ public:
 
 	void Render(Gdiplus::Graphics* InGraphics);
 	void HandleKeyState(WPARAM InKey, bool InIsPressed);
+	void Tick(float InDeltaTime);
 
 private:
+	// 플레이어가 그려질 크기
+	static constexpr int PixelSize = 64;
+
 	// 플레이어 키 입력 상태
 	std::unordered_map<InputDirection, bool> KeyWasPressedMap;
 
@@ -31,10 +31,8 @@ private:
 	PointF Position{ 0.0f, 0.0f };
 
 	//플레이어의 이동 속도
-	float Speed = 10.0f;
+	float Speed = 150.0f;
 
-	// 플레이어가 그려질 크기
-	static constexpr int PixelSize = 64;
 
 	// 플레이어 이미지가 들어있을 비트맵
 	Gdiplus::Bitmap* Image = nullptr;   // 플레이어가 그려질 종이
