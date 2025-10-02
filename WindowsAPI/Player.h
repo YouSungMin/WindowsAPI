@@ -9,7 +9,7 @@ class Player : public Actor
 {
 public:
 	Player() = delete;
-	Player(const wchar_t* InImagePath);
+	Player(ResourceID InID);
 	~Player()override{};
 
 	void OnRender(Gdiplus::Graphics* InGraphics)override;

@@ -2,8 +2,8 @@
 #include "Common.h"
 #include "GameManager.h"
 
-Player::Player(const wchar_t* InImagePath)
-    : Actor(InImagePath)
+Player::Player(ResourceID InID)
+    : Actor(InID)
 {
     Position.Y = 700;
     Position.X = 300;

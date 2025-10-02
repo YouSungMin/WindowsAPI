@@ -5,8 +5,8 @@ class Actor
 {
 public:
 	Actor() = delete;
-	Actor(const wchar_t* InImagePath);
-	virtual ~Actor();
+	Actor(ResourceID InID);
+	virtual ~Actor() = default;
 
 	virtual void OnRender(Gdiplus::Graphics* InGraphics);
 	virtual void OnTick(float InDeltaTime);

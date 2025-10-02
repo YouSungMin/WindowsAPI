@@ -2,8 +2,8 @@
 #include "GameManager.h"
 
 //BackGround::BackGround(const wchar_t* InImagePath, float InY)
-BackGround::BackGround(const wchar_t* InImagePath)
-    : Actor(InImagePath)
+BackGround::BackGround(ResourceID InID)
+    : Actor(InID)
 {
     Pivot.X = 0;
     Pivot.Y = 0;

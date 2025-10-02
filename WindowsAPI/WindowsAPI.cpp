@@ -38,6 +38,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     ULONG_PTR Token;
     Gdiplus::GdiplusStartupInput StartupInput;
     Gdiplus::GdiplusStartup(&Token, &StartupInput, nullptr);
+    ResourceManager::Get().Initialize();
     GameManager::Get().Initialize();
 
 
@@ -82,7 +83,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             nullptr, FALSE); // 매 프레임마다 WM_PAINT요청
     }
     GameManager::Get().Destroy();
-
+    ResourceManager::Get().Destroy();
     // GDI+ 정리하기
     Gdiplus::GdiplusShutdown(Token);
     return (int)msg.wParam;

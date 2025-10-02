@@ -12,4 +12,6 @@
 
 #include "TestHouseActor.h"
 
+#include "ResourceManager.h"
+
 #include "GameManager.h"

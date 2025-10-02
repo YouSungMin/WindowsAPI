@@ -2,7 +2,7 @@
 #include "GameManager.h"
 
 TestActor::TestActor()
-    :Actor(nullptr)
+    :Actor(ResourceID::None)
 {
     WindowWidth = GameManager::ScreenWidth;
     WindowHeight = GameManager::ScreenHeight;

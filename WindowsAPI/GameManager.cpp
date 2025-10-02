@@ -14,20 +14,20 @@ void GameManager::Initialize()
         MessageBox(hMainWindow, L"백 버퍼 그래픽스 생성 실패", L"오류", MB_OK | MB_ICONERROR);
     }
 
-    MainPlayer = new Player(L"./Images/playerShip1_blue.png");
+    MainPlayer = new Player(ResourceID::Player);
     MainPlayer->SetRenderLayer(RenderLayer::Player);
-    AddActor(MainPlayer);
+    AddActor(RenderLayer::Player,MainPlayer);
     TestActor* testActor = new TestActor();
     testActor->SetRenderLayer(RenderLayer::Test);
-    AddActor(testActor);
-    BackGround* background = new BackGround(L"./Images/purple.png");
+    AddActor(RenderLayer::Test,testActor);
+    BackGround* background = new BackGround(ResourceID::Background);
     background->SetRenderLayer(RenderLayer::Background);
-    AddActor(background);
+    AddActor(RenderLayer::Background,background);
 }
 
 void GameManager::Destroy()
 {
-    for (const auto& pair : RenderLayers)
+    for (const auto& pair : Actors)
     {
         // 각 레이어(pair.second)에 있는 벡터를 순회합니다.
         for (Actor* actor : pair.second)
@@ -38,7 +38,7 @@ void GameManager::Destroy()
             }
         }
     }
-    RenderLayers.clear();
+    Actors.clear();
 
     delete BackBufferGraphics;
     BackBufferGraphics = nullptr;
@@ -48,7 +48,7 @@ void GameManager::Destroy()
 
 void GameManager::Tick(float InDeltaTime)
 {
-    for (const auto& pair : RenderLayers)
+    for (const auto& pair : Actors)
     {
         // 해당 레이어에 속한 모든 액터들을 렌더링합니다.
         for (Actor* actor : pair.second)
@@ -59,11 +59,6 @@ void GameManager::Tick(float InDeltaTime)
             }
         }
     }
-    //for (Actor* Actor : Actors)
-    //{
-    //    Actor->OnTick(InDeltaTime);
-
-    //}
 }
 
 void GameManager::Render()
@@ -72,12 +67,8 @@ void GameManager::Render()
     {
         BackBufferGraphics->Clear(Gdiplus::Color(255, 0, 0, 0));
 
-        //for (Actor* Actor : Actors)
-        //{
-        //    Actor->OnRender(BackBufferGraphics);
-        for (const auto& pair : RenderLayers)
+        for (const auto& pair : Actors)
         {
-            // 해당 레이어에 속한 모든 액터들을 렌더링합니다.
             for (Actor* actor : pair.second)
             {
                 if (actor)
@@ -94,11 +85,3 @@ void GameManager::HandleKeyState(WPARAM InKey, bool InIsPressed)
     MainPlayer->HandleKeyState(InKey, InIsPressed);
 }
 
-void GameManager::AddActor(Actor* InActor)
-{
-    if (InActor == nullptr) return;
-    RenderLayer layer = InActor->GetRenderLayer();
-
-    RenderLayers[layer].push_back(InActor);
-    //Actors.push_back(InActor);
-}

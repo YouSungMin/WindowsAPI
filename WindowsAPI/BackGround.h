@@ -5,7 +5,7 @@ class BackGround : public Actor
 {
 public:
 	BackGround() = delete;
-	BackGround(const wchar_t* InImagePath);
+	BackGround(ResourceID InID);
 	~BackGround()override{};
 	//BackGround(const wchar_t* InImagePath,float InY);
 

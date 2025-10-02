@@ -21,7 +21,7 @@ public:
 	void Render();
 	void HandleKeyState(WPARAM InKey, bool InIsPressed);
 
-	void AddActor(Actor* InActor);
+	void AddActor(RenderLayer InRenderLayer, Actor* InActor){Actors[InRenderLayer].push_back(InActor);}
 
 	static constexpr unsigned int ScreenWidth = 600;
 	static constexpr unsigned int ScreenHeight = 800;
@@ -58,6 +58,6 @@ private:
 
 	Player* MainPlayer = nullptr;
 
-	std::map<RenderLayer, std::vector<Actor*>>RenderLayers;
+	std::map<RenderLayer, std::vector<Actor*>>Actors;
 };
 
